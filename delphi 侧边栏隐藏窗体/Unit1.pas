@@ -1,0 +1,107 @@
+unit Unit1;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, ExtCtrls, StdCtrls,Math, pBarCode;
+
+type
+  TForm1 = class(TForm)
+    Timer1: TTimer;
+    pnl1: TPanel;
+    btn1: TButton;
+    brcd1: TBarCode;
+    procedure Timer1Timer(Sender: TObject);
+    procedure btn1Click(Sender: TObject);
+    procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X,
+      Y: Integer);
+    procedure pnl1MouseMove(Sender: TObject; Shift: TShiftState; X,
+      Y: Integer);
+  private
+    { Private declarations }
+    tag :Boolean;
+    FAnchors: TAnchors;
+    procedure WMMOVING(var Msg: TMessage);message WM_MOVING;
+  public
+    { Public declarations }
+  end;
+
+var
+  Form1: TForm1;
+
+implementation
+
+{$R *.dfm}
+
+{ TForm1 }
+
+procedure TForm1.WMMOVING(var Msg: TMessage);
+begin
+     inherited;
+  with PRect(Msg.LParam)^ do
+  begin
+    Left := Min(Max(0, Left), Screen.Width - Width);
+    Top := Min(Max(0, Top), Screen.Height - Height);
+    Right := Min(Max(Width, Right), Screen.Width);
+    Bottom := Min(Max(Height, Bottom), Screen.Height);
+    FAnchors := [];
+    if Left = 0 then Include(FAnchors, akLeft);
+    if Right = Screen.Width then
+      Include(FAnchors, akRight);
+    if Top = 0 then Include(FAnchors, akTop);
+    if Bottom = Screen.Height then
+      Include(FAnchors, akBottom);
+      Timer1.Enabled := FAnchors <> [];
+    end;
+end;
+
+procedure TForm1.Timer1Timer(Sender: TObject);
+const 
+  cOffset = 2;
+  begin
+    if WindowFromPoint(Mouse.CursorPos) = Handle then
+    begin
+      if akLeft in FAnchors then Left := 0;
+      if akTop in FAnchors then Top := 0;
+      if akRight in FAnchors then
+        Left := Screen.Width - Width;
+      if akBottom in FAnchors then
+        Top := Screen.Height - Height;
+      end else
+      begin
+        if akLeft in FAnchors then Left := -Width + cOffset;
+        if akTop in FAnchors then Top := -Height + cOffset;
+        if akRight in FAnchors then
+          Left := Screen.Width - cOffset;
+        if akBottom in FAnchors then
+          Top := Screen.Height - cOffset;
+    end;
+end;
+
+
+procedure TForm1.btn1Click(Sender: TObject);
+begin
+
+pnl1.Visible:=not pnl1.Visible;
+end;
+
+procedure TForm1.FormMouseMove(Sender: TObject; Shift: TShiftState; X,
+  Y: Integer);
+
+begin
+  if (x>185)  and tag then
+  begin
+  pnl1.Visible:=False;
+  tag:= False;
+  end;
+end;
+
+procedure TForm1.pnl1MouseMove(Sender: TObject; Shift: TShiftState; X,
+  Y: Integer);
+begin
+  tag:=True;
+end;
+
+end.
+ 
