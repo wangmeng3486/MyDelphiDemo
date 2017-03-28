@@ -1,0 +1,68 @@
+unit Unit1;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, StdCtrls, ExtCtrls;
+
+type
+  TForm1 = class(TForm)
+    btn1: TButton;
+    Timer1: TTimer;
+    btn2: TButton;
+    procedure btn1Click(Sender: TObject);
+    procedure Timer1Timer(Sender: TObject);
+    procedure btn2Click(Sender: TObject);
+  private
+    PopForm: TForm; 
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Form1: TForm1;
+
+implementation
+
+{$R *.dfm}
+
+procedure TForm1.btn1Click(Sender: TObject);
+begin
+    if(Assigned(PopForm))then
+  PopForm.Free;
+  PopForm := TForm.Create(self);
+  PopForm.Width := 200;
+  PopForm.Height := 150;
+  PopForm.Name := 'PopForm1';
+  PopForm.Left := screen.Width - PopForm.Width;
+  PopForm.Top := screen.Height;
+  PopForm.BorderStyle:=bsToolWindow;
+  PopForm.Show;
+  Timer1.Interval := 30;
+  Timer1.Enabled := True;
+end;
+
+procedure TForm1.Timer1Timer(Sender: TObject);
+var
+  R: TRect;
+  height: Integer;
+begin
+  SystemParametersInfo(SPI_GETWORKAREA, 0, @R, 0);
+  height := Screen.Height - R.Bottom;
+  PopForm.Top := PopForm.Top - 5;
+  if PopForm.Top < screen.Height - PopForm.Height - height then
+  begin
+    Timer1.Enabled := False;
+    //PopForm.Free;
+  end;
+end;
+
+procedure TForm1.btn2Click(Sender: TObject);
+begin
+  PopForm.Free;
+end;
+
+end.
+
+
